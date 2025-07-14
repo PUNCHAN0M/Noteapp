@@ -1,0 +1,48 @@
+version: '3.4'
+
+services:
+  postgresql:
+    image: docker.io/library/postgres:15
+    container_name: postgresql
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=CoEpasswd
+      - POSTGRES_USER=coe
+      - POSTGRES_DB=coedb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      start_period: 20s
+      interval: 60s
+      retries: 5
+      timeout: 5s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    ports:
+      - "7080:80"
+      - "7443:443"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=coe@local.db
+      - PGADMIN_DEFAULT_PASSWORD=CoEpasswd
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  postgresql:
+    driver: local
+  pgadmin:
+    driver: local

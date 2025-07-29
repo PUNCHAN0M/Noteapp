@@ -50,7 +50,11 @@ class TagListField(Field):
 BaseNoteForm = model_form(
     models.Note,
     base_class=FlaskForm,
-    exclude=["created_date", "updated_date"],
+    exclude=[
+        "created_date",
+        "updated_date",
+        "tags",
+    ],  # ยกเว้น tags เพราะจะใช้ TagListField แทน
     db_session=models.db.session,
 )
 

@@ -98,7 +98,9 @@ def notes_create():
 
     # สร้าง note ใหม่
     note = models.Note()
-    form.populate_obj(note)
+    # ใช้ populate_obj แต่ไม่รวม tags (เพราะต้องจัดการแยก)
+    note.title = form.title.data
+    note.description = form.description.data
     note.tags = []
 
     db = models.db

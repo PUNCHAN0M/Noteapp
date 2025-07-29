@@ -42,20 +42,27 @@
 ## 🏗️ โครงสร้างโปรเจกต์
 
 ```
-psunote/
-├── noteapp.py              # แอปพลิเคชันหลัก Flask
-├── models.py               # โมเดลฐานข้อมูล (Note, Tag)
-├── forms.py                # ฟอร์ม WTForms
-├── templates/              # เทมเพลต HTML
-│   ├── base.html           # เทมเพลตหลัก
-│   ├── index.html          # หน้า Dashboard
-│   ├── notes-create.html   # ฟอร์มสร้าง Note
-│   ├── notes-edit.html     # ฟอร์มแก้ไข Note
-│   ├── tags-list.html      # รายการ Tags
-│   ├── tags-create.html    # ฟอร์มสร้าง Tag
-│   └── tags-view.html      # แสดง Notes ตาม Tag
+dockerPosgres/
+├── psunote/                # โฟลเดอร์แอปพลิเคชันหลัก
+│   ├── noteapp.py          # แอปพลิเคชันหลัก Flask
+│   ├── models.py           # โมเดลฐานข้อมูล (Note, Tag)
+│   ├── forms.py            # ฟอร์ม WTForms
+│   └── templates/          # เทมเพลต HTML
+│       ├── base.html       # เทมเพลตหลัก
+│       ├── index.html      # หน้า Dashboard
+│       ├── notes-create.html   # ฟอร์มสร้าง Note
+│       ├── notes-edit.html     # ฟอร์มแก้ไข Note
+│       ├── tags-list.html      # รายการ Tags
+│       ├── tags-create.html    # ฟอร์มสร้าง Tag
+│       ├── tags-edit.html      # ฟอร์มแก้ไข Tag
+│       └── tags-view.html      # แสดง Notes ตาม Tag
+├── .vscode/                # VS Code configuration
+│   └── tasks.json          # ตั้งค่า Tasks สำหรับ VS Code
 ├── requirements.txt        # Python dependencies
-└── docker-compose.yml      # PostgreSQL container
+├── docker-compose.yml      # PostgreSQL container
+├── .gitignore             # Git ignore rules
+├── README.md              # เอกสารนี้
+└── SETUP.md               # คู่มือการตั้งค่าและรัน
 ```
 
 ## 🗄️ โครงสร้างฐานข้อมูล
@@ -81,43 +88,56 @@ psunote/
 
 ## 🔧 การติดตั้งและรัน
 
-### 1. เตรียมความพร้อม
+### วิธีที่ 1: ใช้ VS Code Tasks (แนะนำ)
+
+โปรเจกต์นี้มีการตั้งค่า VS Code Tasks ไว้แล้ว สำหรับรายละเอียดดู [SETUP.md](SETUP.md)
+
+**ขั้นตอนย่อ:**
+
+1. เปิดโปรเจกต์ใน VS Code
+2. กด `Ctrl + Shift + P` และพิมพ์ `Tasks: Run Task`
+3. เลือก `Setup and Run All` เพื่อรันทั้งระบบ
+
+### วิธีที่ 2: รันแบบ Manual
+
+#### 1. เตรียมความพร้อม
 
 ```bash
 # Clone หรือ download โปรเจกต์
-cd dockerPosgres/psunote
+cd dockerPosgres
 
 # สร้าง virtual environment (แนะนำ)
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
+python -m venv .venv
+.venv\Scripts\activate     # Windows
 # หรือ
-venv\Scripts\activate     # Windows
+source .venv/bin/activate  # Linux/Mac
 ```
 
-### 2. ติดตั้ง Dependencies
+#### 2. ติดตั้ง Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. เริ่ม PostgreSQL Database
+#### 3. เริ่ม PostgreSQL Database
 
 ```bash
-# ใน directory ที่มี docker-compose.yml
+# ใน directory หลัก (dockerPosgres)
 docker-compose up -d
 ```
 
-### 4. ตั้งค่าฐานข้อมูล
+#### 4. ตั้งค่าฐานข้อมูล
+
+ตรวจสอบการเชื่อมต่อใน `psunote/noteapp.py`:
 
 ```python
-# ตรวจสอบการเชื่อมต่อใน noteapp.py
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://pun:123456@localhost:5432/coedb"
 ```
 
-### 5. รันแอปพลิเคชัน
+#### 5. รันแอปพลิเคชัน
 
 ```bash
-python noteapp.py
+python psunote/noteapp.py
 ```
 
 เปิดเบราว์เซอร์ไปที่: `http://localhost:5000`
@@ -187,19 +207,29 @@ python noteapp.py
 ## 📋 Dependencies (requirements.txt)
 
 ```
-Flask==2.3.3
-Flask-SQLAlchemy==3.0.5
-Flask-WTF==1.1.1
-WTForms==3.0.1
-WTForms-SQLAlchemy==0.3
-psycopg2-binary==2.9.7
+blinker==1.9.0
+click==8.2.1
+colorama==0.4.6
+Flask==3.1.1
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.2
+greenlet==3.2.3
+itsdangerous==2.2.0
+Jinja2==3.1.6
+MarkupSafe==3.0.2
+psycopg2-binary==2.9.10
+SQLAlchemy==2.0.41
+typing_extensions==4.14.1
+Werkzeug==3.1.3
+WTForms==3.2.1
+WTForms-SQLAlchemy==0.4.2
 ```
 
 ## 🔧 การปรับแต่ง
 
 ### เปลี่ยน Database Connection
 
-แก้ไขใน `noteapp.py`:
+แก้ไขใน `psunote/noteapp.py`:
 
 ```python
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://username:password@host:port/database"
@@ -207,7 +237,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://username:password@host:por
 
 ### เปลี่ยน Secret Key
 
-แก้ไขใน `noteapp.py`:
+แก้ไขใน `psunote/noteapp.py`:
 
 ```python
 app.config["SECRET_KEY"] = "your-secret-key-here"
@@ -215,26 +245,43 @@ app.config["SECRET_KEY"] = "your-secret-key-here"
 
 ### ปรับแต่ง UI
 
-- แก้ไขไฟล์ในโฟลเดอร์ `templates/`
+- แก้ไขไฟล์ในโฟลเดอร์ `psunote/templates/`
 - ปรับ CSS ใน `base.html`
 - เพิ่ม JavaScript ตามต้องการ
+
+### ปรับแต่ง VS Code Tasks
+
+แก้ไขไฟล์ `.vscode/tasks.json` เพื่อเปลี่ยนคำสั่งหรือเพิ่ม Task ใหม่
 
 ## 🐛 การแก้ไขปัญหาเบื้องต้น
 
 ### 1. Database Connection Error
 
 - ตรวจสอบว่า PostgreSQL ทำงานอยู่: `docker-compose ps`
-- ตรวจสอบ connection string ใน `noteapp.py`
+- ตรวจสอบ connection string ใน `psunote/noteapp.py`
+- รีสตาร์ท PostgreSQL: `docker-compose restart postgresql`
 
 ### 2. Import Error
 
 - ตรวจสอบ virtual environment: `pip list`
 - ติดตั้ง dependencies: `pip install -r requirements.txt`
+- ตรวจสอบว่าอยู่ในโฟลเดอร์ที่ถูกต้อง
 
 ### 3. Template Not Found
 
-- ตรวจสอบโครงสร้างโฟลเดอร์ `templates/`
+- ตรวจสอบโครงสร้างโฟลเดอร์ `psunote/templates/`
 - ตรวจสอบชื่อไฟล์ template ใน routes
+
+### 4. AttributeError กับ Tags
+
+- ปัญหานี้แก้ไขแล้วใน version ปัจจุบัน
+- ถ้ายังพบปัญหา ให้ตรวจสอบไฟล์ `psunote/forms.py` และ `psunote/noteapp.py`
+
+### 5. VS Code Tasks ไม่ทำงาน
+
+- ตรวจสอบว่าเปิดโปรเจกต์ในโฟลเดอร์ `dockerPosgres` (ไม่ใช่ subfolder)
+- ตรวจสอบไฟล์ `.vscode/tasks.json`
+- รีสตาร์ท VS Code
 
 ---
 

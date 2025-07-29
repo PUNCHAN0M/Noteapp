@@ -1,0 +1,129 @@
+{% extends 'base.html' %} {% block title %}จัดการ Tags - PSU Note{% endblock %} {% block body %}
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3><i class="bi bi-tags"></i> จัดการ Tags</h3>
+  <div>
+    <a href="{{ url_for('tags_create') }}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> สร้าง Tag ใหม่
+    </a>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> กลับหน้าแรก
+    </a>
+  </div>
+</div>
+
+<!-- Statistics -->
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card bg-info text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4>{{ tags|length }}</h4>
+            <p class="mb-0">จำนวน Tags ทั้งหมด</p>
+          </div>
+          <div class="align-self-center">
+            <i class="bi bi-tags" style="font-size: 2rem"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tags List -->
+{% if tags %}
+<div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">รายการ Tags ทั้งหมด</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      {% for tag in tags %}
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h6 class="card-title mb-0"><i class="bi bi-tag"></i> {{ tag.name }}</h6>
+              <span class="badge bg-primary"> {{ tag_counts.get(tag.id, 0) }} Notes </span>
+            </div>
+
+            <div class="mt-auto">
+              <small class="text-muted">
+                <i class="bi bi-calendar"></i>
+                สร้างเมื่อ: {{ tag.created_date.strftime('%d/%m/%Y') }}
+              </small>
+              <div class="mt-2 d-flex gap-2 flex-wrap">
+                <a
+                  href="{{ url_for('index', tag=tag.name) }}"
+                  class="btn btn-sm btn-outline-primary"
+                >
+                  <i class="bi bi-eye"></i> ดู Notes
+                </a>
+                <a
+                  href="{{ url_for('tags_edit', tag_id=tag.id) }}"
+                  class="btn btn-sm btn-warning"
+                  title="แก้ไข Tag"
+                >
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <form
+                  method="POST"
+                  action="{{ url_for('tags_delete', tag_id=tag.id) }}"
+                  style="display: inline"
+                  onsubmit="return confirm('คุณแน่ใจที่จะลบ Tag &quot;{{ tag.name }}&quot; หรือไม่?\n\nการลบ Tag จะลบ Tag ออกจาก Notes ทั้งหมดที่ใช้งานด้วย')"
+                >
+                  <button type="submit" class="btn btn-sm btn-danger" title="ลบ Tag">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% else %}
+<!-- Empty State -->
+<div class="text-center py-5">
+  <i class="bi bi-tags" style="font-size: 4rem; color: #6c757d"></i>
+  <h4 class="text-muted mt-3">ยังไม่มี Tags ในระบบ</h4>
+  <p class="text-muted">Tags จะถูกสร้างอัตโนมัติเมื่อคุณสร้าง Note หรือสามารถสร้างแยกได้</p>
+  <a href="{{ url_for('tags_create') }}" class="btn btn-primary">
+    <i class="bi bi-plus-circle"></i> สร้าง Tag แรก
+  </a>
+</div>
+{% endif %}
+
+<!-- Usage Information -->
+<div class="card mt-4">
+  <div class="card-header">
+    <h6 class="mb-0"><i class="bi bi-info-circle"></i> ข้อมูลการใช้งาน Tags</h6>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <h6>วิธีใช้ Tags:</h6>
+        <ul>
+          <li>Tags ช่วยในการจัดหมวดหมู่ Notes</li>
+          <li>สามารถกรอง Notes ตาม Tag ได้</li>
+          <li>Tags จะถูกสร้างอัตโนมัติเมื่อสร้าง Note</li>
+          <li>หนึ่ง Note สามารถมีหลาย Tags ได้</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h6>การจัดการ Tags:</h6>
+        <ul>
+          <li>Tags ที่ไม่มี Note ใดใช้จะยังคงอยู่ในระบบ</li>
+          <li>สามารถใช้ Tags เดิมได้เมื่อสร้าง Note ใหม่</li>
+          <li>การค้นหาจะค้นหาใน Tag ด้วย</li>
+          <li>Tags จะแสดงใน Sidebar สำหรับกรอง</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

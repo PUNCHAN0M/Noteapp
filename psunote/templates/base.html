@@ -3,20 +3,150 @@
   <head>
     <title>{% block title %}Hello PSU Note{% endblock %}</title>
     <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
     <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+
+    <style>
+      .sidebar {
+        height: calc(100vh - 56px);
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        border-right: 1px solid #dee2e6;
+      }
+      .tag-link {
+        display: block;
+        padding: 8px 15px;
+        color: #495057;
+        text-decoration: none;
+        border-left: 3px solid transparent;
+        transition: all 0.2s ease;
+      }
+      .tag-link:hover {
+        background-color: #e9ecef;
+        border-left-color: #007bff;
+        color: #007bff;
+        text-decoration: none;
+      }
+      .tag-link.active {
+        background-color: #007bff;
+        color: white;
+        border-left-color: #0056b3;
+      }
+      .main-content {
+        height: calc(100vh - 56px);
+        overflow-y: auto;
+      }
+    </style>
   </head>
   <body>
-    <nav class="navbar navbar-dark bg-dark text-center">
-      <div class="mx-auto order-0" >
-          <a class="navbar-brand mx-auto" href="{{ url_for('index') }}">{{ self.title() }}</a>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+          <i class="bi bi-journal-text"></i> {{ self.title() }}
+        </a>
+
+        <!-- Search Form in Navbar -->
+        <form class="d-flex" action="{{ url_for('index') }}" method="GET">
+          <input
+            class="form-control me-2"
+            type="search"
+            name="search"
+            placeholder="ค้นหา Note..."
+            value="{{ request.args.get('search', '') }}"
+          />
+          <button class="btn btn-outline-light" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </form>
+
+        <!-- Navigation Menu -->
+        <div class="d-flex">
+          <a class="btn btn-outline-light me-2" href="{{ url_for('notes_create') }}">
+            <i class="bi bi-plus-circle"></i> สร้าง Note
+          </a>
+          <a class="btn btn-outline-light me-2" href="{{ url_for('tags_create') }}">
+            <i class="bi bi-tag"></i> สร้าง Tag
+          </a>
+          <a class="btn btn-outline-light" href="{{ url_for('tags_list') }}">
+            <i class="bi bi-tags"></i> จัดการ Tags
+          </a>
+        </div>
       </div>
-</nav>
-    <div class="container">
-    {% block body %}
-      Default template
-    {% endblock %}
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 px-0">
+          <div class="sidebar">
+            <div class="p-3">
+              <h6 class="text-muted mb-3"><i class="bi bi-funnel"></i> กรองตาม Tags</h6>
+
+              <!-- All Notes Link -->
+              <a
+                href="{{ url_for('index') }}"
+                class="tag-link {% if not request.args.get('tag') %}active{% endif %}"
+              >
+                <i class="bi bi-journal-text"></i> ทั้งหมด {% if total_notes is defined %}
+                <span class="badge bg-secondary ms-2">{{ total_notes }}</span>
+                {% endif %}
+              </a>
+
+              <!-- Tags List -->
+              {% if sidebar_tags %} {% for tag in sidebar_tags %}
+              <a
+                href="{{ url_for('index', tag=tag.name) }}"
+                class="tag-link {% if request.args.get('tag') == tag.name %}active{% endif %}"
+              >
+                <i class="bi bi-tag"></i> {{ tag.name }}
+              </a>
+              {% endfor %} {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10">
+          <div class="main-content p-4">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {%
+            for category, message in messages %}
+            <div
+              class="alert alert-{% if category == 'error' %}danger{% elif category == 'warning' %}warning{% else %}success{% endif %} alert-dismissible fade show"
+              role="alert"
+            >
+              {% if category == 'success' %}
+              <i class="bi bi-check-circle"></i>
+              {% elif category == 'warning' %}
+              <i class="bi bi-exclamation-triangle"></i>
+              {% else %}
+              <i class="bi bi-x-circle"></i>
+              {% endif %} {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %} {% endif %} {% endwith %}
+
+            <!-- Main Content Block -->
+            {% block body %} Default template {% endblock %}
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>

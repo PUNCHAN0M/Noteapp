@@ -1,12 +1,25 @@
-{% extends 'base.html' %} {% block title %}สร้าง Note ใหม่ - PSU Note{% endblock %} {% block body %}
+{% extends 'base.html' %} {% block title %}แก้ไข Note - {{ note.title }} - PSU Note{% endblock %} {%
+block body %}
 <div class="row justify-content-center">
   <div class="col-md-8">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h3><i class="bi bi-plus-circle"></i> สร้าง Note ใหม่</h3>
-      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left"></i> กลับหน้าแรก
-      </a>
+      <h3><i class="bi bi-pencil-square"></i> แก้ไข Note: {{ note.title }}</h3>
+      <div>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
+          <i class="bi bi-arrow-left"></i> กลับหน้าแรก
+        </a>
+        <form
+          method="POST"
+          action="{{ url_for('notes_delete', note_id=note.id) }}"
+          style="display: inline"
+          onsubmit="return confirm('คุณแน่ใจที่จะลบ Note นี้หรือไม่?')"
+        >
+          <button type="submit" class="btn btn-outline-danger">
+            <i class="bi bi-trash"></i> ลบ Note
+          </button>
+        </form>
+      </div>
     </div>
 
     <!-- Form -->
@@ -65,8 +78,8 @@
 
           <!-- Submit Buttons -->
           <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">
-              <i class="bi bi-check-circle"></i> {{ form.submit.label.text }}
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-check-circle"></i> บันทึกการเปลี่ยนแปลง
             </button>
             <a href="{{ url_for('index') }}" class="btn btn-secondary">
               <i class="bi bi-x-circle"></i> ยกเลิก
@@ -76,22 +89,34 @@
       </div>
     </div>
 
+    <!-- Note Information -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h6 class="mb-0"><i class="bi bi-info-circle"></i> ข้อมูล Note</h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>สร้างเมื่อ:</strong> {{ note.created_date.strftime('%d/%m/%Y %H:%M') }}
+          </div>
+          <div class="col-md-6">
+            <strong>แก้ไขล่าสุด:</strong> {{ note.updated_date.strftime('%d/%m/%Y %H:%M') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Help Section -->
     <div class="card mt-4">
       <div class="card-header">
-        <h6 class="mb-0"><i class="bi bi-question-circle"></i> คำแนะนำ</h6>
+        <h6 class="mb-0"><i class="bi bi-question-circle"></i> คำแนะนำการแก้ไข</h6>
       </div>
       <div class="card-body">
         <ul class="mb-0">
-          <li><strong>หัวข้อ:</strong> ใส่ชื่อหัวข้อที่สื่อความหมายได้ดี</li>
-          <li>
-            <strong>รายละเอียด:</strong> เขียนรายละเอียดที่สำคัญ สามารถใช้ข้อความหลายบรรทัดได้
-          </li>
-          <li>
-            <strong>Tags:</strong> ใส่ tags เพื่อง่ายต่อการจัดหมวดหมู่และค้นหา เช่น "งาน, สำคัญ,
-            python"
-          </li>
-          <li><strong>การค้นหา:</strong> ระบบจะค้นหาได้จากหัวข้อ รายละเอียด และ tags</li>
+          <li><strong>แก้ไข Tags:</strong> สามารถเพิ่ม/ลบ tags ได้ โดยคั่นด้วยจุลภาค</li>
+          <li><strong>Tags ใหม่:</strong> หาก tag ที่ใส่ยังไม่มีในระบบ จะถูกสร้างขึ้นอัตโนมัติ</li>
+          <li><strong>การลบ:</strong> การลบ Note จะลบข้อมูลออกจากระบบถาวร</li>
+          <li><strong>Tags ที่ไม่ใช้:</strong> Tags ที่ไม่มี Note ใดใช้งานจะยังคงอยู่ในระบบ</li>
         </ul>
       </div>
     </div>
